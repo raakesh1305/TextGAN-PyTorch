@@ -208,6 +208,13 @@ class CatGANInstructor(BasicInstructor):
                         best_child_opt[id_replace] = copy.deepcopy(self.gen_adv_opt.state_dict())
                         best_fake_samples[id_replace] = self.eval_fake_samples
                         selected_mutation[id_replace] = criterionG.loss_mode
+                       
+                        self.log.info('Updated parent parameters at epoch {}:'.format(epoch))
+                        for name, param in self.parents[id_replace].items():
+                            self.log.info('%s: %s' % (name, param))
+                         self.log.info('Updated parent_adv_opts at epoch {}:'.format(epoch))
+                        for name, param in self.parent_adv_opts[id_replace].items():
+                            self.log.info('%s: %s' % (name, param))
                 count += 1
 
         self.parents = copy.deepcopy(best_child)
@@ -283,6 +290,13 @@ class CatGANInstructor(BasicInstructor):
                         best_child_opt[id_replace] = temp_child_opt
                         best_fake_samples[id_replace] = temp_fake_samples
                         selected_mutation[id_replace] = criterionG.loss_mode
+                        
+                        self.log.info('Updated parent parameters at epoch {}:'.format(epoch))
+                        for name, param in best_child[id_replace].items():
+                            self.log.info('%s: %s' % (name, param))
+                        self.log.info('Updated parent_adv_opts at epoch {}:'.format(epoch))
+                        for name, param in best_child_opt[id_replace].items():
+                            self.log.info('%s: %s' % (name, param))
                 count += 1
 
         self.parents = copy.deepcopy(best_child)
@@ -348,6 +362,13 @@ class CatGANInstructor(BasicInstructor):
                 best_child_opt[id_replace] = copy.deepcopy(self.gen_adv_opt.state_dict())
                 best_fake_samples[id_replace] = self.eval_fake_samples
                 selected_mutation.append(criterionG.loss_mode)
+                
+                self.log.info('Updated parent parameters at epoch {}:'.format(epoch))
+                    for name, param in best_child[id_replace].items():
+                        self.log.info('%s: %s' % (name, param))
+                        self.log.info('Updated parent_adv_opts at epoch {}:'.format(epoch))
+                    for name, param in best_child_opt[id_replace].items():
+                        self.log.info('%s: %s' % (name, param))
 
         self.parents = copy.deepcopy(best_child)
         self.parent_adv_opts = copy.deepcopy(best_child_opt)
