@@ -138,22 +138,27 @@ class CatGANInstructor(BasicInstructor):
         pass
 
     def pretrain_generator(self, epochs):
-        """
-        Max Likelihood Pre-training for the generator
-        """
-        for epoch in range(epochs):
-            # ===Train===
-            pre_loss = self.train_gen_epoch(self.gen, self.all_oracle_data.loader, self.mle_criterion, self.gen_opt)
+    """
+    Max Likelihood Pre-training for the generator
+    """
+    for epoch in range(epochs):
+        # ===Train===
+        pre_loss = self.train_gen_epoch(self.gen, self.all_oracle_data.loader, self.mle_criterion, self.gen_opt)
 
-            # ===Test===
-            if epoch % cfg.pre_log_step == 0 or epoch == epochs - 1:
-                self.log.info(
-                    '[MLE-GEN] epoch %d : pre_loss = %.4f, %s' % (
-                        epoch, pre_loss, self.comb_metrics(fmt_str=True)))
+        # ===Test===
+        if epoch % cfg.pre_log_step == 0 or epoch == epochs - 1:
+            self.log.info(
+                '[MLE-GEN] epoch %d : pre_loss = %.4f, %s' % (
+                    epoch, pre_loss, self.comb_metrics(fmt_str=True)))
 
-                if not cfg.if_test and cfg.if_save:
-                    for label_i in range(cfg.k_label):
-                        self._save('MLE', epoch, label_i)
+            # Output Generator parameters
+            if cfg.if_save and not cfg.if_test:
+                self.log.info('Generator Parameters at epoch %d:' % epoch)
+                for name, param in self.gen.named_parameters():
+                    self.log.info('%s: %s' % (name, param))
+
+                for label_i in range(cfg.k_label):
+                    self._save('MLE', epoch, label_i)
 
     def evolve_generator(self, evo_g_step):
         # evaluation real data
