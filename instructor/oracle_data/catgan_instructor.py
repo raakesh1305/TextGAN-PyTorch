@@ -126,6 +126,13 @@ class CatGANInstructor(BasicInstructor):
 
                 self.log.info('[ADV] epoch %d: temp = %.4f, d_loss: %.4f, %s' % (
                     adv_epoch, self.gen.temperature.item(), d_loss, self.comb_metrics(fmt_str=True)))
+                # Output Generator parameters after testing
+                self.log.info('Generator Parameters after testing:')
+                for name, param in self.gen.named_parameters():
+                    self.log.info('%s:\n%s' % (name, param))
+                self.log.info('Adversarial Optimizer param values after testing:')
+                for name, param in self.gen_adv_opt.state_dict().items():
+                    self.log.info('Adv_opt %s:\n%s' % (name, param))
 
                 if cfg.if_save and not cfg.if_test:
                     for label_i in range(cfg.k_label):
@@ -209,12 +216,6 @@ class CatGANInstructor(BasicInstructor):
                         best_fake_samples[id_replace] = self.eval_fake_samples
                         selected_mutation[id_replace] = criterionG.loss_mode
                        
-                        self.log.info('Updated parent parameters at epoch {}:'.format(epoch))
-                        for name, param in self.parents[id_replace].items():
-                            self.log.info('%s: %s' % (name, param))
-                         self.log.info('Updated parent_adv_opts at epoch {}:'.format(epoch))
-                        for name, param in self.parent_adv_opts[id_replace].items():
-                            self.log.info('%s: %s' % (name, param))
                 count += 1
 
         self.parents = copy.deepcopy(best_child)
@@ -291,12 +292,6 @@ class CatGANInstructor(BasicInstructor):
                         best_fake_samples[id_replace] = temp_fake_samples
                         selected_mutation[id_replace] = criterionG.loss_mode
                         
-                        self.log.info('Updated parent parameters at epoch {}:'.format(epoch))
-                        for name, param in best_child[id_replace].items():
-                            self.log.info('%s: %s' % (name, param))
-                        self.log.info('Updated parent_adv_opts at epoch {}:'.format(epoch))
-                        for name, param in best_child_opt[id_replace].items():
-                            self.log.info('%s: %s' % (name, param))
                 count += 1
 
         self.parents = copy.deepcopy(best_child)
@@ -362,13 +357,6 @@ class CatGANInstructor(BasicInstructor):
                 best_child_opt[id_replace] = copy.deepcopy(self.gen_adv_opt.state_dict())
                 best_fake_samples[id_replace] = self.eval_fake_samples
                 selected_mutation.append(criterionG.loss_mode)
-                
-                self.log.info('Updated parent parameters at epoch {}:'.format(epoch))
-                    for name, param in best_child[id_replace].items():
-                        self.log.info('%s: %s' % (name, param))
-                        self.log.info('Updated parent_adv_opts at epoch {}:'.format(epoch))
-                    for name, param in best_child_opt[id_replace].items():
-                        self.log.info('%s: %s' % (name, param))
 
         self.parents = copy.deepcopy(best_child)
         self.parent_adv_opts = copy.deepcopy(best_child_opt)
